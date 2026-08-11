@@ -1,0 +1,10 @@
+Table,Type,Purpose
+Patients,Dimension,Patient master
+Doctors,Dimension,Doctor and specialty master
+Departments,Dimension,Hospital departments
+DateDim,Dimension,Calendar/date intelligence
+Encounters,Fact,OPD/IPD/Emergency encounters
+Admissions,Fact,Inpatient admissions and LOS
+LabOrders,Fact,Laboratory orders and TAT
+Pharmacy,Fact,Medicine sales
+Billing,Fact,Hospital billing and collections

@@ -1,0 +1,108 @@
+EMR POWER BI SAMPLE PROJECT
+============================
+
+Recommended model: Star schema
+
+DIMENSIONS
+- DateDim[Date]
+- Patients[PatientID]
+- Doctors[DoctorID]
+- Departments[DepartmentID]
+
+FACT TABLES
+- Encounters
+- Admissions
+- LabOrders
+- Pharmacy
+- Billing
+
+Suggested relationships:
+DateDim[Date] 1:* Encounters[EncounterDate]
+DateDim[Date] 1:* Admissions[AdmissionDate]
+DateDim[Date] 1:* LabOrders[TestDate]
+DateDim[Date] 1:* Pharmacy[SaleDate]
+DateDim[Date] 1:* Billing[BillDate]
+
+Patients[PatientID] 1:* Encounters[PatientID]
+Patients[PatientID] 1:* Admissions[PatientID]
+Patients[PatientID] 1:* LabOrders[PatientID]
+Patients[PatientID] 1:* Pharmacy[PatientID]
+Patients[PatientID] 1:* Billing[PatientID]
+
+Doctors[DoctorID] 1:* Encounters[DoctorID]
+Doctors[DoctorID] 1:* Admissions[DoctorID]
+Doctors[DoctorID] 1:* LabOrders[DoctorID]
+Doctors[DoctorID] 1:* Pharmacy[DoctorID]
+
+CORE DAX
+---------
+Total Encounters = COUNTROWS(Encounters)
+
+Completed Encounters =
+CALCULATE([Total Encounters], Encounters[VisitStatus] = "Completed")
+
+Total Patients = DISTINCTCOUNT(Encounters[PatientID])
+
+Total Admissions = COUNTROWS(Admissions)
+
+Average LOS = AVERAGE(Admissions[LOS_Days])
+
+Total Bed Revenue = SUM(Admissions[BedRevenue])
+
+Total Lab Revenue = SUM(LabOrders[NetAmount])
+
+Total Pharmacy Revenue = SUM(Pharmacy[NetAmount])
+
+Total Billing Revenue = SUM(Billing[NetBill])
+
+Total Hospital Revenue =
+[Total Bed Revenue] + [Total Lab Revenue] +
+[Total Pharmacy Revenue] + [Total Billing Revenue]
+
+Average Lab TAT = AVERAGE(LabOrders[TAT_Minutes])
+
+Pending Lab Orders =
+CALCULATE(COUNTROWS(LabOrders), LabOrders[ResultStatus] = "Pending")
+
+Cancelled Encounters =
+CALCULATE([Total Encounters], Encounters[VisitStatus] = "Cancelled")
+
+Cancellation % =
+DIVIDE([Cancelled Encounters], [Total Encounters], 0)
+
+Revenue per Patient =
+DIVIDE([Total Hospital Revenue], [Total Patients], 0)
+
+Current Year Revenue =
+CALCULATE([Total Hospital Revenue], YEAR(DateDim[Date]) = YEAR(TODAY()))
+
+Monthly Revenue Trend:
+Use DateDim[YearMonth] on X-axis and [Total Hospital Revenue] as Values.
+
+DASHBOARD PAGES
+---------------
+1. Executive Overview
+   KPI cards: Patients, Encounters, Admissions, Revenue, Avg LOS
+   Charts: Monthly Revenue, Department Encounters, Revenue by Bill Type
+
+2. Patient & OPD Analytics
+   New/returning patient analysis, doctor performance, department volume
+
+3. IPD / Admission Analytics
+   Admissions, LOS, ward utilization, bed revenue, admission type
+
+4. Laboratory Analytics
+   Test volume, revenue, pending tests, average TAT, test-wise analysis
+
+5. Pharmacy Analytics
+   Medicine sales, quantity, revenue, payment status
+
+6. Billing & Finance
+   Gross bill, discount, net revenue, payment mode/status
+
+INTERVIEW PROJECT STORY
+-----------------------
+"Built an EMR analytics dashboard using a star schema to monitor patient
+volume, OPD/IPD activity, laboratory TAT, pharmacy revenue and billing.
+Used Power Query for transformation, DAX for KPIs and time intelligence,
+and Power BI visuals for management reporting."
